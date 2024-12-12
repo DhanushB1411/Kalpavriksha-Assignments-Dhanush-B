@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+//defining the struct to store the details of the user
 struct user
 {
     int id;
@@ -26,7 +27,7 @@ void main()
 
         switch (ch)
         {
-        case 1:
+        case 1:  // to create new user
         {
             struct user newuser;
 
@@ -53,7 +54,7 @@ void main()
             printf("New user added \n");
             break;
         }
-        case 2:
+        case 2: // to display users
         {
             FILE *fptr = fopen("user.txt", "r");
 
@@ -73,14 +74,14 @@ void main()
             break;
         }
 
-        case 3:
+        case 3:  // to update users
         {
             int id, flag = 0;
             printf("\nEnter the ID to update: ");
             scanf("%d", &id);
 
-            FILE *file1 = fopen("user.txt", "r");
-            FILE *writeFile = fopen("temp.txt", "w");
+            FILE *file1 = fopen("user.txt", "r");  // for reading
+            FILE *writeFile = fopen("temp.txt", "w"); // for writing
 
             if (file1 == NULL || writeFile == NULL)
             {
@@ -121,11 +122,12 @@ void main()
 
         case 4:
         {
+            // to delete the users
             int id, flag = 0;
             printf("Enter the ID to delete: ");
             scanf("%d", &id);
 
-            FILE *file = fopen("user.txt", "r");
+            FILE *file = fopen("user.txt", "r"); 
             FILE *tempFile = fopen("temp.txt", "w");
 
             if (file == NULL || tempFile == NULL)
@@ -162,7 +164,7 @@ void main()
             break;
         }
 
-        case 5:
+        case 5: // exiting the program
             printf("\nExiting \nThank YOU");
             exit(0);
 

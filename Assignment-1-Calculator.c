@@ -1,30 +1,38 @@
 #include<stdio.h>
 
+
+/* To check the error
+error - 1 for  invalid expression 
+error -2 for division by zero error */
 int error = 0;
 
+
+// The function is to check the priority of the operator according to the DMAS
 int priority_op(char operator){
     if(operator == '*' || operator == '/')return 1;
     if(operator == '+' || operator == '-')return 0;
     return -1;
 }
 
+
+/* The fuction to  calculate the input */
 int calculate(char input[]){
 
-    int numbers[1000]; // to store the number;
-    char operators[1000]; //to store operators;
+    int numbers[1000];  // array to store numbers or operands
+    char operators[1000]; // array to store operators
 
-    int num_idx =0;
+    int num_idx =0;  
     int op_idx =-1;
 
     int i=0;
     while(input[i] !='\0'){
 
-        if(input[i] == ' '){
+        if(input[i] == ' '){  //skip blank space
             i++;
             continue;
         }
 
-    
+        // push to numbers array if it is only number 
         if(input[i] >= '0' && input[i]<='9'){
             int temp_num=0;
             while(input[i]>='0' && input[i] <='9'){
@@ -66,6 +74,7 @@ int calculate(char input[]){
             return 0;
         }
     }
+    // calculating for the remaining operands
     while(op_idx !=-1){
         int num1 = numbers[--num_idx];
         int num2 = numbers[--num_idx];
@@ -90,6 +99,9 @@ int calculate(char input[]){
     int ans = numbers[0];
     return ans;
 }
+
+
+// main function
 void main(){
 
     char input[1000];
