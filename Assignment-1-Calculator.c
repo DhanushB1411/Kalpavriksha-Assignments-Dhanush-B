@@ -1,130 +1,138 @@
 #include<stdio.h>
 
+#define ADD '+'
+#define SUBTRACT '-'
+#define MULTIPLY '*'
+#define DIVIDE '/'
 
-/* To check the error
-error - 1 for  invalid expression 
-error -2 for division by zero error */
-int error = 0;
-
-
-// The function is to check the priority of the operator according to the DMAS
-int priority_op(char operator){
-    if(operator == '*' || operator == '/')return 1;
-    if(operator == '+' || operator == '-')return 0;
+/* Function to check the priority of the operator based on DMAS */
+int getOperatorPriority(char operator){
+    if(operator == MULTIPLY || operator == DIVIDE) return 1;
+    if(operator == ADD || operator == SUBTRACT) return 0;
     return -1;
 }
 
-
-/* The fuction to  calculate the input */
-int calculate(char input[]){
-
-    int numbers[1000];  // array to store numbers or operands
-    char operators[1000]; // array to store operators
-
-    int num_idx =0;  
-    int op_idx =-1;
-
-    int i=0;
-    while(input[i] !='\0'){
-
-        if(input[i] == ' '){  //skip blank space
-            i++;
-            continue;
+/* Function to remove blank spaces from input */
+void removeBlankSpaces(char input[]){
+    int iteratorI = 0, index = 0;
+    while(input[iteratorI] != '\0'){
+        if(input[iteratorI] != ' '){
+            input[index++] = input[iteratorI];
         }
+        iteratorI++;
+    }
+    input[index] = '\0'; // Terminate cleaned string
+}
 
-        // push to numbers array if it is only number 
-        if(input[i] >= '0' && input[i]<='9'){
-            int temp_num=0;
-            while(input[i]>='0' && input[i] <='9'){
-                temp_num = temp_num*10 + (input[i]-'0');
-                i++;
+/* Function to calculate remaining operations */
+int evaluateRemainingOperations(int numbers[], char operators[], int *numberIndex, int *operatorIndex, int *errorStatus){
+    while((*operatorIndex) != -1){
+        int operand1 = numbers[--(*numberIndex)];
+        int operand2 = numbers[--(*numberIndex)];
+        char operator = operators[(*operatorIndex)--];
+
+        if(operator == MULTIPLY){
+            numbers[(*numberIndex)++] = operand2 * operand1;
+        }
+        else if(operator == SUBTRACT){
+            numbers[(*numberIndex)++] = operand2 - operand1;
+        }
+        else if(operator == ADD){
+            numbers[(*numberIndex)++] = operand2 + operand1;
+        }
+        else if(operator == DIVIDE){
+            if(operand1 == 0){
+                *errorStatus = 2;
+                return 0;
             }
-            numbers[num_idx] = temp_num;
-            num_idx++;
+            numbers[(*numberIndex)++] = operand2 / operand1;
         }
-        else if( input[i] == '*' || input[i] == '/' || input[i] == '+' || input[i] == '-'){
+    }
+    return numbers[0];
+}
 
-            while(op_idx !=-1 && priority_op(operators[op_idx])>= priority_op(input[i])) {
-                int num1 = numbers[--num_idx];
+/* Function to perform the calculation based on the input */
+int performCalculation(char input[], int *errorStatus){
+    int numbers[1000];      // Array to store numbers or operands
+    char operators[1000];   // Array to store operators
 
-                int num2 = numbers[--num_idx];
-                
-                char operator = operators[op_idx--];
-                if(operator == '*'){
-                    numbers[num_idx++] = num2*num1;
-                }else if(operator == '-'){
-                    numbers[num_idx++] = num2-num1;
-                }else if(operator == '+'){
-                    numbers[num_idx++] = num2+num1;
-                }else if(operator == '/'){
+    int numberIndex = 0;    
+    int operatorIndex = -1;
 
-                    if(num1 == 0 ){
-                        error =2;
+    int iteratorI = 0;
+    while(input[iteratorI] != '\0'){
+
+        if(input[iteratorI] >= '0' && input[iteratorI] <= '9'){  // If the character is a number
+            int tempNumber = 0;
+            while(input[iteratorI] >= '0' && input[iteratorI] <= '9'){
+                tempNumber = tempNumber * 10 + (input[iteratorI] - '0');
+                iteratorI++;
+            }
+            numbers[numberIndex++] = tempNumber;
+        }
+        else if(input[iteratorI] == MULTIPLY || input[iteratorI] == DIVIDE || 
+                input[iteratorI] == ADD || input[iteratorI] == SUBTRACT){
+
+            while(operatorIndex != -1 && getOperatorPriority(operators[operatorIndex]) >= getOperatorPriority(input[iteratorI])){
+                int operand1 = numbers[--numberIndex];
+                int operand2 = numbers[--numberIndex];
+                char operator = operators[operatorIndex--];
+
+                if(operator == MULTIPLY){
+                    numbers[numberIndex++] = operand2 * operand1;
+                }
+                else if(operator == SUBTRACT){
+                    numbers[numberIndex++] = operand2 - operand1;
+                }
+                else if(operator == ADD){
+                    numbers[numberIndex++] = operand2 + operand1;
+                }
+                else if(operator == DIVIDE){
+                    if(operand1 == 0){
+                        *errorStatus = 2;
                         return 0;
-                    }else {
-                        numbers[num_idx++] = num2/num1;
                     }
+                    numbers[numberIndex++] = operand2 / operand1;
                 }
             }
-            operators[++op_idx]=input[i];
-            i++;
+            operators[++operatorIndex] = input[iteratorI++];
         }
-        else {
-            error =1;
+        else{  // Invalid character detected
+            *errorStatus = 1;
             return 0;
         }
     }
-    // calculating for the remaining operands
-    while(op_idx !=-1){
-        int num1 = numbers[--num_idx];
-        int num2 = numbers[--num_idx];
-
-        char operator =  operators[op_idx--];
-         if(operator == '*'){
-                    numbers[num_idx++] = num2*num1;
-                }else if(operator == '-'){
-                    numbers[num_idx++] = num2-num1;
-                }else if(operator == '+'){
-                    numbers[num_idx++] = num2+num1;
-                }else if(operator == '/'){
-
-                    if(num1 == 0 ){
-                        error =2;
-                        return 0;
-                    }else {
-                        numbers[num_idx++] = num2/num1;
-                    }
-                }
-    }
-    int ans = numbers[0];
-    return ans;
+    return evaluateRemainingOperations(numbers, operators, &numberIndex, &operatorIndex, errorStatus);
 }
 
-
-// main function
-void main(){
-
+/* Main Function */
+int main(){
     char input[1000];
-    printf("Enter the operation : ");
+    printf("Enter the operation: ");
+    fgets(input, 1000, stdin);
 
-    fgets(input,1000,stdin);
-
-    
-    int i=0;
-     for (int i = 0; input[i] != '\0'; i++) {
-        if (input[i] == '\n') {
-            input[i] = '\0';
+    int iteratorI;
+    for(iteratorI = 0; input[iteratorI] != '\0'; iteratorI++){
+        if(input[iteratorI] == '\n'){
+            input[iteratorI] = '\0';
             break;
         }
     }
 
-    int res = calculate(input);
-    
-    if(error == 1){
-        printf(" Invalid expression. Please check the operator  \n");
-    }else if(error == 2){
-        printf(" division by zero 0 is not allowed\n");
-    }else{
-        printf(" answer : %d\n ",res);
+    removeBlankSpaces(input);  // Remove blank spaces from the input
+
+    int errorStatus = 0;
+    int result = performCalculation(input, &errorStatus);
+
+    if(errorStatus == 1){
+        printf("Error: Invalid expression\n");
     }
+    else if(errorStatus == 2){
+        printf("'Error: Division by zero.'\n");
+    }
+    else{
+        printf("Answer: %d\n", result);
+    }
+
+    return 0;
 }
