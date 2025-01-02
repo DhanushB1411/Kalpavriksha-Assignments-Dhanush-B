@@ -23,7 +23,7 @@ long long int PowerMod(unsigned long long base, unsigned long long exponent, uns
     //if exponent is odd 
     if (exponent % 2 == 1)
     {
-        return (value * exponent) % modulus;
+        return (value * base) % modulus;
     }
     
     return value;
