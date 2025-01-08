@@ -3,9 +3,14 @@
 #include <string.h>
 #include <stdbool.h>
 
+
 bool isVowel(char character);
+
 void copyString(char *destination, const char *source);
-void printTotalVowelsAndLongestName(char *names[100][100], int rowCount, int columnCount);
+
+void printTotalVowelsAndLongestName(char *names[10][101], int rowCount, int columnCount);
+
+int stringLenght(char *string);
 
 int main()
 {
@@ -15,7 +20,7 @@ int main()
     printf("Enter number of columns: ");
     scanf("%d", &columnCount);
 
-    char *names[100][100];
+    char *names[10][101];
 
     for (int iteratorI = 0; iteratorI < rowCount; iteratorI++)
     {
@@ -23,7 +28,7 @@ int main()
         {
             names[iteratorI][iteratorJ] = (char *)malloc(51 * sizeof(char));
             printf("Name at (%d,%d): ", iteratorI, iteratorJ);
-            scanf(" %[^\n]", names[iteratorI][iteratorJ]);
+            scanf(" %[^\n]", *(*(names + iteratorI) + iteratorJ));
         }
     }
 
@@ -32,7 +37,7 @@ int main()
     {
         for (int iteratorJ = 0; iteratorJ < columnCount; iteratorJ++)
         {
-            printf("%s ", names[iteratorI][iteratorJ]); 
+            printf("%s ", *(*(names + iteratorI) + iteratorJ));
         }
         printf("\n");
     }
@@ -52,24 +57,26 @@ int main()
 
 bool isVowel(char character)
 {
+    // converting lower to upper
     if (character >= 'a' && character <= 'z')
-        character = character - ('a' - 'A');
-
+    {
+        character = character - ('a' - 'A'); // character -36
+    }
     return (character == 'A' || character == 'E' || character == 'I' || character == 'O' || character == 'U');
 }
 
-void copyString(char *destination, const char *source)
+void copyString(char *destinationString, const char *sourceString)
 {
-    while (*source != '\0')
+    while (*sourceString != '\0')
     {
-        *destination = *source;
-        destination++;
-        source++;
+        *destinationString = *sourceString;
+        destinationString++;
+        sourceString++;
     }
-    *destination = '\0';
+    *destinationString = '\0';
 }
 
-void printTotalVowelsAndLongestName(char *names[100][100], int rowCount, int columnCount)
+void printTotalVowelsAndLongestName(char *names[10][101], int rowCount, int columnCount)
 {
     int vowelCount = 0;
     int maxLength = 0;
@@ -79,17 +86,17 @@ void printTotalVowelsAndLongestName(char *names[100][100], int rowCount, int col
     {
         for (int iteratorJ = 0; iteratorJ < columnCount; iteratorJ++)
         {
-            if (isVowel(names[iteratorI][iteratorJ][0]))
+            if (isVowel(*(*(*(names + iteratorI) + iteratorJ))))
             {
                 vowelCount++;
             }
 
-            int currentLength = strlen(names[iteratorI][iteratorJ]);
+            int currentLength = stringLenght(*(*(names + iteratorI) + iteratorJ));
 
             if (maxLength < currentLength)
             {
                 maxLength = currentLength;
-                copyString(longestName, names[iteratorI][iteratorJ]);
+                copyString(longestName, *(*(names + iteratorI) + iteratorJ));
             }
         }
     }
@@ -98,4 +105,15 @@ void printTotalVowelsAndLongestName(char *names[100][100], int rowCount, int col
     printf("The longest name: %s\n", longestName);
 
     free(longestName);
+}
+
+int stringLenght(char *string)
+{
+    int count = 0;
+    while (*string)
+    {
+        count++;
+        string++;
+    }
+    return count;
 }
